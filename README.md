@@ -1,13 +1,16 @@
 # Инструкция по запуску проекта
 
 1. склонировать репозиторий: 
-```bash git clone https://github.com/GerlakhA/vk-test-group.git && cd vk-test-group
+```bash 
+git clone https://github.com/GerlakhA/vk-test-group.git && cd vk-test-group
 ```
 2. Чтобы перейти в папку с фронтендом нужно: 
-```bash cd vkTestGroup
+```bash 
+cd vkTestGroup
 ```
 3. Чтобы запустить фронтенд нужно сначала установить все зависимости: 
-```bash npm i
+```bash 
+npm i
 ```
 4. Команда для запуска: 
 ```bash 
@@ -21,4 +24,7 @@ cd vk-test-group-backend
 ```bash
  npm i
 ```
-7. Команда для запуска: ```bash npm start```
+7. Команда для запуска: 
+```bash
+ npm start
+```
