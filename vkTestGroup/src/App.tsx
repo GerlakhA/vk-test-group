@@ -18,108 +18,71 @@ function App() {
 	const deboucedValue = useDebounce(searchColor)
 	const debouncedId = useDebounce(filterId)
 
+	const processServerData = async (reqURL: string, successToastMsg: string) => {
+		await axios
+			.get<GetGroupsResponse>(reqURL)
+			.then(res => {
+				if (!res.data?.data) {
+					toast.error(
+						'Произошла ошибка. Данные не пришли с сервера или данных нет',
+						{
+							closeButton: true,
+							duration: 60000
+						}
+					)
+				} else if (res.data.result === 1) {
+					toast.error(
+						'Произошла ошибка. Сервер ответил с кодом ответа result: 1',
+						{
+							closeButton: true,
+							duration: 60000
+						}
+					)
+				} else {
+					setGetGroups(res.data.data)
+					toast.success(successToastMsg)
+				}
+			})
+			.catch(() => {
+				toast.error(
+					'Произошла ошибка. Невозможно получить данные с сервера: cервер не отвечает',
+					{
+						closeButton: true,
+						duration: 60000
+					}
+				)
+			})
+	}
+
 	const fetchData = async (id: number) => {
 		if (id === 0) {
 			await new Promise(resolve => setTimeout(resolve, 1000))
-			await axios
-				.get<GetGroupsResponse>(MAIN_URL)
-				.then(res => {
-					if (res.data) {
-						console.log('result: 0')
-					}
-					//@ts-ignore
-					setGetGroups(res?.data)
-				})
-				.then(() => toast.success('Вы применили фильтр по всем параметрам'))
-				.catch(error => {
-					toast.error(error)
-					console.log('result: 1')
-				})
+			processServerData(MAIN_URL, 'Вы применили фильтр по всем параметрам')
 		} else if (id === 1) {
-			await axios
-				.get<GetGroupsResponse>(`${MAIN_URL}?closed=false`)
-				.then(res => {
-					if (res.data) {
-						console.log('result: 0')
-					}
-					//@ts-ignore
-					setGetGroups(res?.data)
-				})
-				.then(() => toast.success('Вы применили фильтр по открытым группам'))
-				.catch(error => {
-					toast.error(error)
-					console.log('result: 1')
-				})
+			processServerData(
+				`${MAIN_URL}?closed=false`,
+				'Вы применили фильтр по открытым группам'
+			)
 		} else if (id === 2) {
-			await axios
-				.get<GetGroupsResponse>(`${MAIN_URL}?closed=true`)
-				.then(res => {
-					if (res.data) {
-						console.log('result: 0')
-					}
-					//@ts-ignore
-					setGetGroups(res?.data)
-				})
-				.then(() => toast.success('Вы применили фильтр по закрытым группам'))
-				.catch(error => {
-					toast.error(error)
-					console.log('result: 1')
-				})
+			processServerData(
+				`${MAIN_URL}?closed=true`,
+				'Вы применили фильтр по закрытым группам'
+			)
 		} else if (id === 3) {
-			await axios
-				.get<GetGroupsResponse>(`${MAIN_URL}?has_friends=true`)
-				.then(res => {
-					if (res.data) {
-						console.log('result: 0')
-					}
-					//@ts-ignore
-					setGetGroups(res?.data)
-				})
-				.then(() =>
-					toast.success(
-						`Вы применили фильтр по группам где состоят ваши друзья`
-					)
-				)
-				.catch(error => {
-					toast.error(error)
-					console.log('result: 1')
-				})
+			processServerData(
+				`${MAIN_URL}?has_friends=true`,
+				`Вы применили фильтр по группам где состоят ваши друзья`
+			)
 		} else if (id === 4) {
-			await axios
-				.get<GetGroupsResponse>(`${MAIN_URL}?has_friends=false`)
-				.then(res => {
-					if (res.data) {
-						console.log('result: 0')
-					}
-					//@ts-ignore
-					setGetGroups(res?.data)
-				})
-				.then(() =>
-					toast.success(
-						`Вы применили фильтр по группам где не состоят ваши друзья`
-					)
-				)
-				.catch(error => {
-					toast.error(error)
-					console.log('result: 1')
-				})
+			processServerData(
+				`${MAIN_URL}?has_friends=false`,
+				`Вы применили фильтр по группам где не состоят ваши друзья`
+			)
 		} else if (id === 5 && deboucedValue) {
-			await axios
-				.get<GetGroupsResponse>(`${MAIN_URL}?avatar_color=${deboucedValue}`)
-				.then(res => {
-					if (res.data) {
-						console.log('result: 0')
-					}
-					//@ts-ignore
-					setGetGroups(res?.data)
-				})
-				.then(() =>
-					toast.success(`Вы применили фильтр по цвету ${deboucedValue}`)
-				)
-				.catch(error => {
-					toast.error(error)
-					console.log('result: 1')
-				})
+			processServerData(
+				`${MAIN_URL}?avatar_color=${deboucedValue}`,
+				`Вы применили фильтр по цвету ${deboucedValue}`
+			)
 		}
 	}
 
@@ -146,25 +109,26 @@ function App() {
 				setFilterId={(i: number) => setFilterId(i)}
 			/>
 			{filterId === 5 && (
-				<div className='flex flex-col gap-6 absolute right-[275px] top-[70px] p-2 bg-gray-500/30 rounded-lg'>
+				<div className='flex flex-col gap-6 absolute right-[265px] top-[70px] p-2 bg-gray-500/30 rounded-lg'>
 					{colors.map((color, i) => (
 						<div
 							key={i}
 							onClick={() => setSearchColor(color)}
 							className={cn(
-								'p-2 text-black rounded-lg text-center cursor-pointer',
+								'p-2 text-black rounded-lg text-center cursor-pointer ring',
 								searchColor === color && 'ring-4 ring-black'
 							)}
-							style={{ backgroundColor: color }}
+							style={{
+								backgroundColor: color === 'no_color' ? 'transparent' : color
+							}}
 						>
 							<span>{color}</span>
 						</div>
 					))}
 				</div>
 			)}
-			{getGroups?.map(group => (
-				<GroupItem key={group.id} group={group} />
-			))}
+			{getGroups?.length &&
+				getGroups?.map(group => <GroupItem key={group.id} group={group} />)}
 		</div>
 	)
 }

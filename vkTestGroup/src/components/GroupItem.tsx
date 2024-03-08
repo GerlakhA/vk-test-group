@@ -1,3 +1,4 @@
+import cn from 'clsx'
 import { useState } from 'react'
 import { Group } from '../types/groups.type'
 
@@ -14,7 +15,10 @@ export const GroupItem = ({ group }: { group: Group }) => {
 				<div className='flex justify-between p-2'>
 					<div
 						style={{ backgroundColor: group.avatar_color }}
-						className='w-[100px] h-[100px] flex justify-center items-center rounded-full border'
+						className={cn(
+							'w-[100px] h-[100px] flex justify-center items-center rounded-full border',
+							!group.avatar_color && 'bg-transparent'
+						)}
 					>
 						<p className='flex justify-center items-center text-black font-semibold text-xl'>
 							{group.name[0]}

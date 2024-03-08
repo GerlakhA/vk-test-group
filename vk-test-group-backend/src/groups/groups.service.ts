@@ -7,33 +7,41 @@ export class GroupsService {
   constructor() {}
 
   getGroups = () => {
-    return groupsData.data;
+    return { result: 0, data: groupsData };
   };
 
   filtredClosedGroups(closed: boolean) {
-    return groupsData?.data?.filter((item) => item.closed === closed);
+    return {
+      result: 0,
+      data: groupsData?.filter((item) => item.closed === closed),
+    };
   }
 
   filtredColorGroups(avatar_color: string) {
-    if (!groupsData.data) {
-      console.log((groupsData.result = 1));
+    if (avatar_color === 'no_color') {
+      return {
+        result: 0,
+        data: groupsData?.filter((item) => !item.avatar_color),
+      };
+    } else {
+      return {
+        result: 0,
+        data: groupsData?.filter((item) => item.avatar_color === avatar_color),
+      };
     }
-    return groupsData?.data?.filter(
-      (item) => item.avatar_color === avatar_color,
-    );
   }
 
   groupsHaveFriends() {
-    if (!groupsData.data) {
-      console.log((groupsData.result = 1));
-    }
-    return groupsData?.data?.filter((item) => item.friends?.length);
+    return {
+      result: 0,
+      data: groupsData?.filter((item) => item.friends?.length),
+    };
   }
 
   groupsDontHaveFriends() {
-    if (!groupsData.data) {
-      console.log((groupsData.result = 1));
-    }
-    return groupsData?.data?.filter((item) => !item.friends?.length);
+    return {
+      result: 0,
+      data: groupsData?.filter((item) => !item.friends?.length),
+    };
   }
 }

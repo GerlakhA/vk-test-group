@@ -5,5 +5,6 @@ export const colors = [
 	'yellow',
 	'white',
 	'orange',
-	'blue'
+	'blue',
+	'no_color'
 ]
