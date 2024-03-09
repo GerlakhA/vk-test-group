@@ -1,4 +1,3 @@
-import axios from 'axios'
 import cn from 'clsx'
 import { Shell } from 'lucide-react'
 import { useEffect, useState } from 'react'
@@ -6,9 +5,16 @@ import { toast } from 'sonner'
 import { Filters } from './components/Filters'
 import { GroupItem } from './components/GroupItem'
 import { colors } from './constants/colors.const'
-import { MAIN_URL } from './constants/url.const'
+import { GROUPS_JSON } from './constants/url.const'
 import { useDebounce } from './hooks/useDebounce'
-import { GetGroupsResponse, Group } from './types/groups.type'
+import { Group } from './types/groups.type'
+import {
+	closedGroups,
+	dontHaveFriends,
+	getAll,
+	haveFriends,
+	openedGroups
+} from './utils/filterFunctions'
 
 function App() {
 	const [getGroups, setGetGroups] = useState<Group[]>()
@@ -18,11 +24,15 @@ function App() {
 	const deboucedValue = useDebounce(searchColor)
 	const debouncedId = useDebounce(filterId)
 
-	const processServerData = async (reqURL: string, successToastMsg: string) => {
-		await axios
-			.get<GetGroupsResponse>(reqURL)
+	const processServerData = async (
+		reqURL: string,
+		successToastMsg: string,
+		filterGroups: (arr: Group[]) => Group[]
+	) => {
+		await fetch(reqURL)
+			.then(res => res.json())
 			.then(res => {
-				if (!res.data?.data) {
+				if (!res.data) {
 					toast.error(
 						'Произошла ошибка. Данные не пришли с сервера или данных нет',
 						{
@@ -30,7 +40,7 @@ function App() {
 							duration: 60000
 						}
 					)
-				} else if (res.data.result === 1) {
+				} else if (res.result === 1) {
 					toast.error(
 						'Произошла ошибка. Сервер ответил с кодом ответа result: 1',
 						{
@@ -39,7 +49,7 @@ function App() {
 						}
 					)
 				} else {
-					setGetGroups(res.data.data)
+					setGetGroups(filterGroups(res.data))
 					toast.success(successToastMsg)
 				}
 			})
@@ -54,34 +64,54 @@ function App() {
 			})
 	}
 
+	const printColor = (arr: any) =>
+		arr.filter((item: Group) => {
+			if (searchColor === 'no_color') {
+				return !item.avatar_color
+			} else {
+				return item.avatar_color === searchColor
+			}
+		})
+
 	const fetchData = async (id: number) => {
 		if (id === 0) {
 			await new Promise(resolve => setTimeout(resolve, 1000))
-			processServerData(MAIN_URL, 'Вы применили фильтр по всем параметрам')
+			processServerData(
+				GROUPS_JSON,
+				'Вы применили фильтр по всем параметрам',
+				getAll
+			)
 		} else if (id === 1) {
 			processServerData(
-				`${MAIN_URL}?closed=false`,
-				'Вы применили фильтр по открытым группам'
+				GROUPS_JSON,
+				'Вы применили фильтр по открытым группам',
+				closedGroups
 			)
+			console.log('Открытые группы: ', closedGroups)
 		} else if (id === 2) {
 			processServerData(
-				`${MAIN_URL}?closed=true`,
-				'Вы применили фильтр по закрытым группам'
+				GROUPS_JSON,
+				'Вы применили фильтр по закрытым группам',
+				openedGroups
 			)
+			console.log('Закрытые группы: ', openedGroups)
 		} else if (id === 3) {
 			processServerData(
-				`${MAIN_URL}?has_friends=true`,
-				`Вы применили фильтр по группам где состоят ваши друзья`
+				GROUPS_JSON,
+				`Вы применили фильтр по группам где состоят ваши друзья`,
+				haveFriends
 			)
 		} else if (id === 4) {
 			processServerData(
-				`${MAIN_URL}?has_friends=false`,
-				`Вы применили фильтр по группам где не состоят ваши друзья`
+				GROUPS_JSON,
+				`Вы применили фильтр по группам где не состоят ваши друзья`,
+				dontHaveFriends
 			)
 		} else if (id === 5 && deboucedValue) {
 			processServerData(
-				`${MAIN_URL}?avatar_color=${deboucedValue}`,
-				`Вы применили фильтр по цвету ${deboucedValue}`
+				GROUPS_JSON,
+				`Вы применили фильтр по цвету ${deboucedValue}`,
+				printColor
 			)
 		}
 	}

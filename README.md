@@ -1,30 +1,19 @@
 # Инструкция по запуску проекта
 
-1. склонировать репозиторий: 
-```bash 
-git clone https://github.com/GerlakhA/vk-test-group.git && cd vk-test-group
+1. Склонировать репозиторий:
+
+```bash
+git clone https://github.com/GerlakhA/vk-test-group.git && cd vk-test-group && cd vkTestGroup
 ```
-2. Чтобы перейти в папку с фронтендом нужно: 
-```bash 
-cd vkTestGroup
-```
-3. Чтобы запустить фронтенд нужно сначала установить все зависимости: 
-```bash 
+
+2. Установить все зависимости для react-приложения:
+
+```bash
 npm i
 ```
-4. Команда для запуска: 
-```bash 
+
+3. Запустить react-приложение через команду:
+
+```bash
 npm run dev
-```
-5. Чтобы перейти в папку с сервером нужно: 
-```bash 
-cd vk-test-group-backend
-```
-6. Чтобы запустить сервер нужно сначала установить все зависимости: 
-```bash
- npm i
-```
-7. Команда для запуска: 
-```bash
- npm start
 ```
